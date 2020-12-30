@@ -9,4 +9,6 @@ Based on the Ray Casting technique, where the objects are drawn entirely out o v
 Video tutorial here: https://youtu.be/5xyeWBxmqzc
 
  ![](gif.gif)
+ 
+ 
 <img src="https://avatars0.githubusercontent.com/u/76776190?s=460&u=8f3943b46a0f1060a462d8a2922319edd9cd241c&v=4" width="100" height="100">
