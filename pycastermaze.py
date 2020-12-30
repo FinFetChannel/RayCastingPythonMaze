@@ -87,4 +87,3 @@ while True: #main game loop
         posx, posy = (x, y)
 
 plt.close()
-    
