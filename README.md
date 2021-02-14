@@ -6,7 +6,8 @@ A very simple 3D maze game made from scratch in python, using only three librari
 
 Based on the Ray Casting technique, where the objects are drawn entirely out o vertical lines. The size and position of the lines is defined by the distance between the player and the object.
 
-Video tutorial here: https://youtu.be/5xyeWBxmqzc
+First part Video tutorial here: https://youtu.be/5xyeWBxmqzc
+Second part Video tutorial here: https://youtu.be/ravnXknUvvQ
 
  ![](gif.gif)
  
