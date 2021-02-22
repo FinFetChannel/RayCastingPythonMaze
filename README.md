@@ -8,7 +8,7 @@ Based on the Ray Casting technique, where the objects are drawn entirely out o v
 
 First part Video tutorial here: https://youtu.be/5xyeWBxmqzc
 
-Second part Video tutorial here: https://youtu.be/ravnXknUvvQ
+Second part Video, with scanline ray casting, here: https://youtu.be/ravnXknUvvQ
 
  ![](gif.gif)
  
