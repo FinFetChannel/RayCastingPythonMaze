@@ -49,14 +49,16 @@ while True: #main game loop
             n = n+1
             if abs(int(3*xx)-int(3*x)) > 0 or abs(int(3*yy)-int(3*y))>0:
                 tilex.append(i)
-                tiley.append(-1/(0.02 * n * np.cos(rot_i)))
+##                tiley.append(-1/(0.02 * n))
+                tiley.append(-1/(0.02 * n*np.cos(np.deg2rad(i - 30))))
                 if int(x) == exitx and int(y) == exity:
                     tilec.append('b')
                 else:
                     tilec.append('k')
                     
             if mapa[int(x)][int(y)] != 0:
-                h = np.clip(1/(0.02 * n * np.cos(rot_i)), 0, 1)
+##                h = np.clip(1/(0.02 * n), 0, 1)
+                h = np.clip(1/(0.02 * n*np.cos(np.deg2rad(i-30))), 0, 1)
                 c = np.asarray(mapa[int(x)][int(y)])*(0.3 + 0.7 * h**2)
                 break 
         plt.vlines(i, -h, h, lw = 8, colors = c) # draw vertical lines
@@ -87,3 +89,4 @@ while True: #main game loop
         posx, posy = (x, y)
 
 plt.close()
+
