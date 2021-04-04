@@ -14,25 +14,25 @@ def main():
         plt.hlines(0.5, 0, 60, colors='k', lw=165, alpha=np.sin((rot-np.pi/2)/2)**2/2)
         plt.scatter([30]*150, -bg, c=-bg, s=200000, marker='_', cmap='Greys')
         plt.scatter([30]*150, bg, c=bg, s=200000, marker='_', cmap='Blues')
-        tilex, tiley, tilec = ([], [], [])
+        tx, ty, tc = ([], [], [])
         for i in range(60): #vision loop
             rot_i = rot + np.deg2rad(i - 30)
             x, y = (posx, posy)
             sin, cos = (0.02*np.sin(rot_i), 0.02*np.cos(rot_i))
             n, half = 0, None
-            c, h, x, y, n, half, tilex, tiley, tilec = caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tilex, tiley, tilec)
+            c, h, x, y, n, half, tx, ty, tc = caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc)
             
             if mapr[int(x)][int(y)] == 1:
-                c, h, x, y, n, half2, tilex, tiley, tilec = reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tilex, tiley, tilec)
-                if mapr[int(x)][int(y)] != 0 and half ==  None:
-                    c, h, x, y, n, half2, tilex, tiley, tilec = reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half2, tilex, tiley, tilec)
+                c, h, x, y, n, half2, tx, ty, tc = reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tx, ty, tc)
+                if mapr[int(x)][int(y)] != 0:# and half ==  None:
+                    c, h, x, y, n, half2, tx, ty, tc = reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half2, tx, ty, tc)
 
             else:
                 plt.vlines(i, -h, h, lw = 8, colors = c) # draw vertical lines
                 if half !=  None:
                     plt.vlines(i, -half[0], 0, lw = 8, colors = half[1])
 
-        plt.scatter(tilex, tiley, c=tilec, s=-50*np.asarray(tiley), zorder = 2, alpha=0.5) # draw tiles on the floor
+        plt.scatter(tx, ty, c=tc, s=-50*np.asarray(ty), zorder = 2, alpha=0.3, marker='s') # draw ts on the floor
         
         plt.axis('off'); plt.tight_layout(); plt.axis([0, 60, -1, 1])
         plt.draw(); plt.pause(0.0001); plt.clf()
@@ -44,8 +44,6 @@ def main():
             break
 
     plt.close()
-
-
 
 def maze_generator(x, y, size):
     mapc = np.random.uniform(0,1, (size,size,3)) 
@@ -111,18 +109,18 @@ def movement(posx, posy, rot, rot_v, maph):
         
     return posx, posy, rot, rot_v, keyout
 
-def caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tilex, tiley, tilec):
+def caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc):
     while True: # ray loop
         xx, yy = (x, y)
         x, y = (x + cos, y + sin)
         n = n+1
-        if half == None and (abs(int(3*xx)-int(3*x)) > 0 or abs(int(3*yy)-int(3*y))>0):
-            tilex.append(i)
-            tiley.append(-1/(0.02 * n*np.cos(np.deg2rad(i - 30))))
+        if half == None and int(x*2)%2 == int(y*2)%2:#(abs(int(3*xx)-int(3*x)) > 0 or abs(int(3*yy)-int(3*y))>0):
+            tx.append(i)
+            ty.append(-1/(0.02 * n*np.cos(np.deg2rad(i - 30))))
             if int(x) == ex and int(y) == ey:
-                tilec.append('b')
+                tc.append('b')
             else:
-                tilec.append('k')
+                tc.append('k')
                 
         if maph[int(x)][int(y)] == 1:
             h , c = shader(n, maph, mapc, sin, cos, x, y, i)
@@ -131,7 +129,7 @@ def caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tilex, tiley, tilec):
             h , c = shader(n, maph, mapc, sin, cos, x, y, i)
             half = [h, c]
 
-    return(c, h, x, y, n, half, tilex, tiley, tilec)
+    return(c, h, x, y, n, half, tx, ty, tc)
 
 
 def shader(n, maph, mapc, sin, cos, x, y, i):
@@ -143,7 +141,7 @@ def shader(n, maph, mapc, sin, cos, x, y, i):
             c = 0.7*c
     return h, c
 
-def reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tilex, tiley, tilec):
+def reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tx, ty, tc):
     if half != None:
         plt.vlines(i, 0, h, lw = 8, colors = c, alpha=0.5) #top reflected
         plt.vlines(i, -half[0], 0, lw = 8, colors = half[1])# bottom regular
@@ -153,7 +151,7 @@ def reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tilex, tile
         cos = -cos
     else:
         sin = -sin
-    c2, h, x, y, n, half2, tilex, tiley, tilec = caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tilex, tiley, tilec)
+    c2, h, x, y, n, half2, tx, ty, tc = caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc)
     c = (c + c2)/2
     if half != None:
         plt.vlines(i, 0, h, lw = 8, colors = c) # draw vertical lines
@@ -161,7 +159,7 @@ def reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tilex, tile
         plt.vlines(i, -h, h, lw = 8, colors = c) # draw vertical lines
         if half2 !=  None:
             plt.vlines(i, -half2[0], 0, lw = 8, colors = half2[1])        
-    return c, h, x, y, n, half2, tilex, tiley, tilec     
+    return c, h, x, y, n, half2, tx, ty, tc     
 
 if __name__ == '__main__':
     main()
