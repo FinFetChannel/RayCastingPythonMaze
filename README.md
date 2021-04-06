@@ -10,7 +10,7 @@ First part Video tutorial here: https://youtu.be/5xyeWBxmqzc
 
 Proto ray tracing: https://youtu.be/ravnXknUvvQ
 
-Racasting 2.0 video: https://youtu.be/WhmTa1NGLSE
+Ray casting 2.0 video: https://youtu.be/WhmTa1NGLSE
 
  ![](gif.gif)
  
