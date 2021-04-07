@@ -135,38 +135,6 @@ def caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc):
 
     return(c, h, x, y, n, half, tx, ty, tc)
 
-def caster3(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc):
-    x, y, h2, n, tx2, ty2, tc2 = ray(x, y, i, ex, ey, maph, sin, cos, half, n)
-    tx, ty, tc = tx+tx2, ty+ty2, tc+tc2
-    h , c = shader(n, maph, mapc, sin, cos, x, y, i)
-    print(h2)
-    if half == None and h2 != None:
-        hh , cc = shader(h2[0], maph, mapc, sin, cos, h2[1], h2[2], i)
-        half = [hh, cc]
-        
-    return(c, h, x, y, n, half, tx, ty, tc)
-
-#@njit#(fastmath=True)
-def ray(x, y, i, ex, ey, maph, sin, cos, half, n):
-    tx, ty, tc  = list([]), list([]), list([])
-    while True: # ray loop
-        xx, yy = (x, y)
-        x, y = (x + cos, y + sin)
-        n = n+1
-        if half == None:
-            if int(x*2)%2 == int(y*2)%2:#(abs(int(3*xx)-int(3*x)) > 0 or abs(int(3*yy)-int(3*y))>0):
-                tx.append(i)
-                ty.append(-1/(0.04 * n*np.cos(np.deg2rad(i - 30))))
-                if int(x) == ex and int(y) == ey:
-                    tc.append('b')
-                else:
-                    tc.append('k')
-            if maph[int(x)][int(y)] == 0.5:
-                half = [n, x, y]
-        if maph[int(x)][int(y)] == 1:
-            break
-    return x, y, half, n, tx, ty, tc
-
 def shader(n, maph, mapc, sin, cos, x, y, i):
     h = np.clip(1/(0.04 * n*np.cos(np.deg2rad(i-30))), 0, 1)
     c = np.asarray(mapc[int(x)][int(y)])*(0.4 + 0.6 * h)
