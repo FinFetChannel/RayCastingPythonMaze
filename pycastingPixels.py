@@ -21,38 +21,42 @@ def main():
     bench=[]
     while True: #main game loop
         start = time()
-        pixels = np.zeros([height, width, 3])
+        pixels = np.ones([height, width, 3])
         rot, last_mouse = rotation(rot, last_mouse)
 ##        plt.hlines(-0.5, 0, 60, colors='k', lw=165, alpha=np.sin((rot+np.pi/2)/2)**2/2)
 ##        plt.hlines(0.5, 0, 60, colors='k', lw=165, alpha=np.sin((rot-np.pi/2)/2)**2/2)
 ##        plt.scatter([30]*150, -bg, c=-bg, s=200000, marker='_', cmap='Greys')
 ##        plt.scatter([30]*150, bg, c=bg, s=200000, marker='_', cmap='Blues')
-        tx, ty, tc = [], [], []
+##        tx, ty, tc = [], [], []
         vx, vy, vyy, vc = [], [], [], []
         for i in range(width): #vision loop
             rot_i = rot + np.deg2rad(i/mod - 30)
             x, y = (posx, posy)
-            sin, cos = (0.02*np.sin(rot_i), 0.02*np.cos(rot_i))
+            sin, cos = (0.05*np.sin(rot_i), 0.05*np.cos(rot_i))
             n, half = 0, None
-            c, h, x, y, n, half, tx, ty, tc = caster(x, y, i/mod, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc)
+            c, h, x, y, n, half, tx, ty, tc = caster(x, y, i/mod, ex, ey, maph, mapc, sin, cos, n, half)
             
             if mapr[int(x)][int(y)] == 2:
-                pyxels = reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tx, ty, tc, pixels)
+                pixels = reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tx, ty, tc, pixels)
 
             else:
 ##                plt.vlines(i, -h, h, lw = 8, colors = c)
 ##                print(h)
+                for g in range(len(ty)):
+                    posf = np.clip((int((-ty[g]*height+height)/2)),0,height-1)
+##                    print(posf, ty[g])
+                    pixels[posf,i] = (tc[g]+pixels[posf][i])/2
                 pixels[int((height - h*height)/2):int((height+h*height)/2),i] = c
 ##                vx.append(i); vy.append(-h); vyy.append(h); vc.append(c)
-                sfloor = height - int((height+h*height)/2)
-                for k in range(sfloor):
-                    angulo = np.deg2rad(90 - 11.25 +k/mod/2)
-                    dist = 0.5*np.tan(angulo)*np.tan(rot_i)
-                    x = posx + dist*np.cos(rot_i)
-                    y = posy + dist*np.sin(rot_i)
-                    if int(x)%2 == int(y)%2:
-                        color = np.asarray([1,1,1])
-                        pixels[height-k-1,i] = color
+
+##                for k in range(sfloor):
+##                    angulo = np.deg2rad(90 - 11.25 +k/mod/2)
+##                    dist = 0.5*np.tan(angulo)*np.tan(rot_i)
+##                    x = posx + dist*np.cos(rot_i)
+##                    y = posy + dist*np.sin(rot_i)
+##                    if int(x)%2 == int(y)%2:
+##                        color = np.asarray([1,1,1])
+##                        pixels[height-k-1,i] = color
                 if half !=  None:
                     pixels[int(height/2):int((height+half[0]*height)/2),i] = half[1]
 ##                    vx.append(i); vy.append(-half[0]); vyy.append(0); vc.append(half[1])
@@ -137,12 +141,12 @@ def movement(posx, posy, rot, maph):
         
     return posx, posy, rot, keyout
 
-def caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc):
+def caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half):#, tx, ty, tc):
     zz= 1
     if half == None:
         zz = 0.5
     x, y, n, tc2, ty2 = fast_ray(x, y, zz, cos, sin, maph, n, i, ex, ey)
-##    tx, ty, tc = tx+[i]*len(ty2), ty+ty2, tc + tc2
+    tx, ty, tc = [i]*len(ty2), ty2, tc2
     h , c = shader(n, maph, mapc, sin, cos, x, y, i)
     if maph[int(x)][int(y)] == 0.5 and half == None:
         half = [h, c, n]
@@ -155,22 +159,22 @@ def caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc):
 
 @njit(fastmath=True)
 def fast_ray(x, y, z, cos, sin, maph, n, i, ex, ey):
-    ty, tc = [0], [0]
+    ty, tc = [], []
     while 1:
         n = n+1
         x, y = x + cos, y + sin
-##        if z == 0.5 and int(x*2)%2 == int(y*2)%2:#(abs(int(3*xx)-int(3*x)) > 0 or abs(int(3*yy)-int(3*y))>0):
-##            ty.append(-1/(0.02 * n*np.cos(np.deg2rad(i - 30))))
-##            if int(x) == ex and int(y) == ey:
-##                tc.append('b')
-##            else:
-##                tc.append('k')
+        if z == 0.5 and int(x*2)%2 == int(y*2)%2:#(abs(int(3*xx)-int(3*x)) > 0 or abs(int(3*yy)-int(3*y))>0):
+            ty.append(-1/(0.05 * n*np.cos(np.deg2rad(i - 30))))
+            if int(x) == ex and int(y) == ey:
+                tc.append(np.asarray([0,0,1]))
+            else:
+                tc.append(np.asarray([0,0,0]))
         if maph[int(x)][int(y)] >= z:
             break        
     return x, y, n, tc, ty
 
 def shader(n, maph, mapc, sin, cos, x, y, i):
-    h = np.clip(1/(0.02 * n*np.cos(np.deg2rad(i-30))), 0, 1)
+    h = np.clip(1/(0.05 * n*np.cos(np.deg2rad(i-30))), 0, 1)
     c = np.asarray(mapc[int(x)][int(y)])*(0.4 + 0.6 * h)
     if maph[int(x+cos)][int(y-sin)] != 0:
         c = 0.85*c
