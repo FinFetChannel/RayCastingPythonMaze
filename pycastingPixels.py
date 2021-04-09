@@ -1,78 +1,86 @@
 import numpy as np
-from matplotlib import pyplot as plt
-from pynput import keyboard, mouse
 from time import time
 from numba import njit
+import pygame as pg
+from pygame.locals import (K_UP, K_DOWN,K_LEFT,K_RIGHT,K_ESCAPE,KEYDOWN,QUIT)
+
+
 
 def main():
+
     size = 15
-    global key; key = None # register keypresses
-    listener = keyboard.Listener(on_press=on_press);listener.start()
-    last_mouse = [0,0]
     posx, posy, rot = (1, np.random.randint(1, size -1), 1) # player pos
     bg = np.linspace(0, 1, 150) #background gradient
     mapc, maph, mapr, ex, ey = maze_generator(posx, posy, size)# map, exit
-    width = 120
+    width = 150
     mod = width/60
     height = int(width*0.75)
-    ax = plt.figure(num = 'Pycaster 2.0').gca()
-    img = ax.imshow(np.zeros([height, width, 3]))
-    plt.axis('off'); plt.tight_layout()
     bench=[]
-    while True: #main game loop
+    
+    running = True
+    pg.init()
+    font = pg.font.SysFont("Arial", 18)
+    pg.mouse.set_visible(False)
+    pg.mouse.set_pos([320, 240])
+    screen = pg.display.set_mode((640, 480))
+    clock = pg.time.Clock()
+    half_h = int(height/2-1)
+    sky = np.asarray([np.linspace(0,.3,half_h),np.linspace(0,.7,half_h),np.linspace(0,1,half_h)]).T
+    floor = np.asarray([np.linspace(0,1,height - half_h),np.linspace(0,1,height - half_h),np.linspace(0,1,height - half_h)]).T
+    while running:
+        
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                running = False
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+
+
+##    while True: #main game loop
         start = time()
         pixels = np.ones([height, width, 3])
-        rot, last_mouse = rotation(rot, last_mouse)
-##        plt.hlines(-0.5, 0, 60, colors='k', lw=165, alpha=np.sin((rot+np.pi/2)/2)**2/2)
-##        plt.hlines(0.5, 0, 60, colors='k', lw=165, alpha=np.sin((rot-np.pi/2)/2)**2/2)
-##        plt.scatter([30]*150, -bg, c=-bg, s=200000, marker='_', cmap='Greys')
-##        plt.scatter([30]*150, bg, c=bg, s=200000, marker='_', cmap='Blues')
-##        tx, ty, tc = [], [], []
-        vx, vy, vyy, vc = [], [], [], []
         for i in range(width): #vision loop
             rot_i = rot + np.deg2rad(i/mod - 30)
+            pixels[0:half_h,i] = sky*(0.7 + np.sin((rot_i+np.pi/2)/2)**2/3)
+            pixels[half_h:,i] = floor*(0.5 + np.sin((rot_i-np.pi/2)/2)**2/2)
             x, y = (posx, posy)
-            sin, cos = (0.05*np.sin(rot_i), 0.05*np.cos(rot_i))
+            sin, cos = (0.02*np.sin(rot_i), 0.02*np.cos(rot_i))
             n, half = 0, None
-            c, h, x, y, n, half, tx, ty, tc = caster(x, y, i/mod, ex, ey, maph, mapc, sin, cos, n, half)
-            
-            if mapr[int(x)][int(y)] == 2:
-                pixels = reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tx, ty, tc, pixels)
-
+            c, h, x, y, n, half, ty, tc = caster(x, y, i/mod, ex, ey, maph, mapc, sin, cos, n, half)
+            if mapr[int(x)][int(y)] == 1:
+                 pixels, ty, tc = reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, pixels, ty, tc, height)
+##            pixels = draw_tiles(i, ty, tc, height, pixels)
             else:
-##                plt.vlines(i, -h, h, lw = 8, colors = c)
-##                print(h)
-                for g in range(len(ty)):
-                    posf = np.clip((int((-ty[g]*height+height)/2)),0,height-1)
-##                    print(posf, ty[g])
-                    pixels[posf,i] = (tc[g]+pixels[posf][i])/2
                 pixels[int((height - h*height)/2):int((height+h*height)/2),i] = c
-##                vx.append(i); vy.append(-h); vyy.append(h); vc.append(c)
-
-##                for k in range(sfloor):
-##                    angulo = np.deg2rad(90 - 11.25 +k/mod/2)
-##                    dist = 0.5*np.tan(angulo)*np.tan(rot_i)
-##                    x = posx + dist*np.cos(rot_i)
-##                    y = posy + dist*np.sin(rot_i)
-##                    if int(x)%2 == int(y)%2:
-##                        color = np.asarray([1,1,1])
-##                        pixels[height-k-1,i] = color
                 if half !=  None:
                     pixels[int(height/2):int((height+half[0]*height)/2),i] = half[1]
-##                    vx.append(i); vy.append(-half[0]); vyy.append(0); vc.append(half[1])
             
-##        plt.vlines(vx, vyy, vy, lw = 8, colors = vc)    
-##        plt.axis('off'); plt.tight_layout(); plt.axis([0, 60, -1, 1])
-##        plt.scatter(tx, ty, c=tc, zorder = 2, alpha=0.5, marker='s') # draw ts on the floor
-##        plt.text(57, 0.9, str(round(1/(time()-start),1)), c='y')
-##        plt.draw();plt.pause(0.0001); plt.clf()
-        img.set_array(pixels); plt.draw(); plt.pause(0.0001)
         # player's movement
-        posx, posy, rot, keyout = movement(posx, posy, rot, maph)
-        if (int(posx) == ex and int(posy) == ey) or keyout == 'esc':
+        pressed_keys = pg.key.get_pressed()
+        
+        if (int(posx) == ex and int(posy) == ey):
             break
-        bench.append(1/(time()-start))
-    plt.close()
+        rot = rotation(rot, pg.mouse.get_pos())
+        pg.mouse.set_pos([320, 240])
+        posx, posy, rot = movement(pressed_keys,posx, posy, rot, maph, clock.tick()/500)
+        surf = pg.surfarray.make_surface(np.rot90(pixels*255).astype('uint8'))
+        surf = pg.transform.scale(surf, (640, 480))
+        screen.blit(surf, (0, 0))
+        fps = font.render(str(int(clock.get_fps())), 1, pg.Color("coral"))
+        screen.blit(fps,(10,0))
+        pg.display.update()
+
+
+
+
+        # Flip the display
+
+##        pg.display.flip()
+        bench.append(1/(time()-start+1e-16))
+
+##    plt.close()
+    pg.quit()
     print(np.mean(bench))
     
 def maze_generator(x, y, size):
@@ -101,60 +109,44 @@ def maze_generator(x, y, size):
                 count = count+1
     return np.asarray(mapc), np.asarray(maph), np.asarray(mapr), ex, ey
 
-def rotation(rot, last_mouse): # for 1080p screen
-    with mouse.Controller() as check:
-        position = check.position
-        if position[0] != last_mouse[0] or position[0]>1860 or position[0] < 60:
-            delta = last_mouse[0] - position[0]
-            if position[0]>1860:
-                delta = 1860 - position[0]
-            if position[0] < 60:
-                delta = 60 - position[0]
-
-            rot = rot + 4*np.pi*(0.5-delta/1920)
-
-
-    return(rot, position)
+def rotation(rot, position): # for 1080p screen
+    delta = (position[0] - 320)
+    rot = rot + 4*np.pi*(0.5-delta/6400)
+    return(rot)
 
 def on_press(key_new):
     global key
     key = key_new
-    
-def movement(posx, posy, rot, maph):
-    global key
+
+def movement(pressed_keys,posx, posy, rot, maph, et):
     x, y = (posx, posy)
-    keyout = None
-    if key is not None:
-        if key == keyboard.Key.up:
-            x, y = (x + 0.3*np.cos(rot), y + 0.3*np.sin(rot))
-        elif key == keyboard.Key.down:
-            x, y = (x - 0.3*np.cos(rot), y - 0.3*np.sin(rot))
-        elif key == keyboard.Key.left:
-            rot = rot - np.pi/8
-        elif key == keyboard.Key.right:
-            rot = rot + np.pi/8
-        elif key == keyboard.Key.esc:
-            keyout = 'esc'
-    key = None        
+    if pressed_keys[K_UP] or pressed_keys[ord('w')]:
+        x, y = (x + et*np.cos(rot), y + et*np.sin(rot))
+    if pressed_keys[K_DOWN] or pressed_keys[ord('s')]:
+        x, y = (x - et*np.cos(rot), y - et*np.sin(rot))
+    if pressed_keys[K_LEFT] or pressed_keys[ord('a')]:
+        x, y = (x - et*np.sin(rot), y + et*np.cos(rot))
+    if pressed_keys[K_RIGHT] or pressed_keys[ord('d')]:
+        x, y = (x + et*np.sin(rot), y - et*np.cos(rot))
     if maph[int(x)][int(y)] == 0:
         posx, posy = (x, y)
+                                                
+    return posx, posy, rot
         
-    return posx, posy, rot, keyout
 
-def caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half):#, tx, ty, tc):
+def caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half):
     zz= 1
     if half == None:
         zz = 0.5
-    x, y, n, tc2, ty2 = fast_ray(x, y, zz, cos, sin, maph, n, i, ex, ey)
-    tx, ty, tc = [i]*len(ty2), ty2, tc2
+    x, y, n, tc, ty = fast_ray(x, y, zz, cos, sin, maph, n, i, ex, ey)
     h , c = shader(n, maph, mapc, sin, cos, x, y, i)
     if maph[int(x)][int(y)] == 0.5 and half == None:
         half = [h, c, n]
         x, y, n, tc2, ty2 = fast_ray(x, y, 1, cos, sin, maph, n, i, ex, ey)
-        tx, ty, tc = tx+[i]*len(ty2), ty+ty2, tc + tc2
+        ty, tc = ty + ty2, tc + tc2
         h , c = shader(n, maph, mapc, sin, cos, x, y, i)
            
-    return(c, h, x, y, n, half, tx, ty, tc)
+    return(c, h, x, y, n, half, ty, tc)
 
 
 @njit(fastmath=True)
@@ -162,9 +154,10 @@ def fast_ray(x, y, z, cos, sin, maph, n, i, ex, ey):
     ty, tc = [], []
     while 1:
         n = n+1
+        xx, yy = x, y
         x, y = x + cos, y + sin
-        if z == 0.5 and int(x*2)%2 == int(y*2)%2:#(abs(int(3*xx)-int(3*x)) > 0 or abs(int(3*yy)-int(3*y))>0):
-            ty.append(-1/(0.05 * n*np.cos(np.deg2rad(i - 30))))
+        if z == 0.5 and (int(x*2) != int(xx*2) or int(y*2) != int(yy*2)):
+            ty.append(-1/(0.02 * n*np.cos(np.deg2rad(i - 30))))
             if int(x) == ex and int(y) == ey:
                 tc.append(np.asarray([0,0,1]))
             else:
@@ -174,7 +167,7 @@ def fast_ray(x, y, z, cos, sin, maph, n, i, ex, ey):
     return x, y, n, tc, ty
 
 def shader(n, maph, mapc, sin, cos, x, y, i):
-    h = np.clip(1/(0.05 * n*np.cos(np.deg2rad(i-30))), 0, 1)
+    h = np.clip(1/(0.02 * n), 0, 1)#*np.cos(np.deg2rad(i-30))), 0, 1)
     c = np.asarray(mapc[int(x)][int(y)])*(0.4 + 0.6 * h)
     if maph[int(x+cos)][int(y-sin)] != 0:
         c = 0.85*c
@@ -182,25 +175,51 @@ def shader(n, maph, mapc, sin, cos, x, y, i):
             c = 0.7*c
     return h, c
 
-def reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tx, ty, tc):
-    if half != None:
-        plt.vlines(i, 0, h, lw = 8, colors = c, alpha=0.5) #top reflected
-        plt.vlines(i, -half[0], 0, lw = 8, colors = half[1])# bottom regular
-    else:
-        plt.vlines(i, -h, h, lw = 8, colors = c, alpha=0.5) # draw vertical lines
+def reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, pixels, ty, tc, height):
+    hor = int(height/2)
+    hh = int((h*height)/2)
+    pixels[hor-hh:hor+hh,i] = np.add(pixels[hor-hh:hor+hh,i], np.asarray([c]*(hh*2)))/2
     if maph[int(x+cos)][int(y-sin)] != 0:
         cos = -cos
     else:
         sin = -sin
-    c2, h, x, y, n, half2, tx, ty, tc = caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc)
-    c = (c + c2)/2
+    c2, h2, x, y, n2, half2, ty2, tc2 = caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half)
+    if n > n2:
+        print(n, n2)
+    ty, tc = ty + ty2, tc + tc2
+    hh = int((h2*height)/2)
+    pixels[hor-hh:hor+hh,i] = (c + c2)/2
+    if half2 != None:
+        hh = int((half2[0]*height)/2)
+        pixels[hor:hor+hh,i] = (c + half2[1])/2
+        
     if half != None:
-        plt.vlines(i, 0, h, lw = 8, colors = c) # draw vertical lines
-    else:
-        plt.vlines(i, -h, h, lw = 8, colors = c) # draw vertical lines
-        if half2 !=  None:
-            plt.vlines(i, -half2[0], 0, lw = 8, colors = half2[1])        
-    return c, h, x, y, n, half2, tx, ty, tc     
+        hh = int((half[0]*height)/2)
+        pixels[hor:hor+hh,i] = half[1]
+        
+##    else:
+##        plt.vlines(i, -h, h, lw = 8, colors = c, alpha=0.5) # draw vertical lines
+##    if maph[int(x+cos)][int(y-sin)] != 0:
+##        cos = -cos
+##    else:
+##        sin = -sin
+##    c2, h, x, y, n, half2, tx, ty, tc = caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, half, tx, ty, tc)
+##    c = (c + c2)/2
+##    if half != None:
+##        plt.vlines(i, 0, h, lw = 8, colors = c) # draw vertical lines
+##    else:
+##        plt.vlines(i, -h, h, lw = 8, colors = c) # draw vertical lines
+##        if half2 !=  None:
+##            plt.vlines(i, -half2[0], 0, lw = 8, colors = half2[1])        
+    return pixels, ty, tc     
+
+def draw_tiles(i, ty, tc, height, pixels):
+##    for g in range(int(len(ty)/2)):
+    for g in range(len(ty)-1):
+        pf = np.clip((int((-ty[g]*height+height)/2)),0,height-1)
+        pf2 = np.clip((int((-ty[g+1]*height+height)/2)),0,height-1)
+        pixels[pf2:pf,i] = np.asarray([np.linspace(0,1,pf-pf2), np.linspace(0,1,pf-pf2), np.linspace(0,1,pf-pf2)]).T#(tc[g*2]+pixels[posf][i])/2
+    return pixels
 
 if __name__ == '__main__':
     main()
