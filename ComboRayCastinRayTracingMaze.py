@@ -333,7 +333,7 @@ def reflection_caster(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, pixe
     hh = int((h*height)/2)
     pixels[hor-hh:hor+hh,i] = np.add(pixels[hor-hh:hor+hh,i], np.asarray([c]*(hh*2)))/2
     
-    if maph[int(x+cos)][int(y-sin)] != 0:
+    if maph[int(x+cos)][int(y-sin)] > 0.5:
         cos = -cos
         
     else:
