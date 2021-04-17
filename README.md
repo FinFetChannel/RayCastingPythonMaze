@@ -56,10 +56,92 @@ After that you should be able to see the middle block surrounded by walls! This 
 * hide axis `plt.axis('off')`
 * remove black spaces `plt.tight_layout()`
 * limit plot region  `plt.axis([0, 60, -1, 1])`
-* replace `plt.show() `  with `plt.draw()`
+* replace `plt.show()`  with `plt.draw()`
 * pause and clearing for next frame `plt.pause(0.0001); plt.clf()`
 * close the window when the game is over `plt.close()`
 
+For the user input we will use the keyboard library. Basically using the arrow keys we try to move the player to a new location, but this only happens if the new location is not a wall. this code should be inside the main game loop.
+
+```python
+    key = keyboard.read_key()
+    x, y = (posx, posy)
+
+    if key == 'up':
+        x, y = (x + 0.3*np.cos(rot), y + 0.3*np.sin(rot))
+    elif key == 'down':
+        x, y = (x - 0.3*np.cos(rot), y - 0.3*np.sin(rot))
+    elif key == 'left':
+        rot = rot - np.pi/8
+    elif key == 'right':
+        rot = rot + np.pi/8
+    elif key == 'esc':
+        break
+
+    if mapa[int(x)][int(y)] == 0:
+        if int(posx) == exitx and int(posy) == exity:
+            break
+        posx, posy = (x, y)
+```
+Now we should have a more les functional game!
+
+<details>
+  <summary>Spoiler warning</summary>
+  
+  ```python
+import numpy as np
+from matplotlib import pyplot as plt
+import keyboard
+
+mapa = [[1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1]]
+
+posx, posy, rot = 1.5, 1.5, np.pi/4
+exitx, exity = 3, 3
+
+while 1:
+    for i in range(60):
+        rot_i = rot + np.deg2rad(i-30)
+        x, y = posx, posy
+        sin, cos = 0.02*np.sin(rot_i), 0.02*np.cos(rot_i)
+        n = 0
+        
+        while 1:
+            x, y, n = x + cos, y + sin, n +1
+            if mapa[int(x)][int(y)]:
+                h = 1/(0.02*n)
+                break
+            
+        plt.vlines(i, -h, h, lw=8)
+
+    plt.axis('off'); plt.tight_layout(); plt.axis([0, 60, -1, 1])
+    plt.draw(); plt.pause(0.0001); plt.clf()
+    
+    key = keyboard.read_key()
+    x, y = (posx, posy)
+
+    if key == 'up':
+        x, y = (x + 0.3*np.cos(rot), y + 0.3*np.sin(rot))
+    elif key == 'down':
+        x, y = (x - 0.3*np.cos(rot), y - 0.3*np.sin(rot))
+    elif key == 'left':
+        rot = rot - np.pi/8
+    elif key == 'right':
+        rot = rot + np.pi/8
+    elif key == 'esc':
+        break
+
+    if mapa[int(x)][int(y)] == 0:
+        if int(posx) == exitx and int(posy) == exity:
+            break
+        posx, posy = (x, y)
+
+plt.show()
+```
+  
+</details>
 
 Proto ray tracing: https://youtu.be/ravnXknUvvQ
 
