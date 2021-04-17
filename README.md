@@ -3,7 +3,7 @@
  ![](gif.gif)
  
 A very simple 3D maze game made from scratch in python, using only three libraries:
-- Numpy
+- [Numpy] https://numpy.org/
 - Matplotlib
 - Keyboard
 
