@@ -50,7 +50,7 @@ for i in range(60):
 
 plt.show()
 ```
-After that you should be able to see the middle block surrounded by walls! This is the basic concept of ray casting graphics, now we can turn it into something that resembles a a game. For that we create a game loop tha encompasses the vision loop and will açso run indefinetly until the game is over. We can make some adjustments to the plotting logic: 
+After that you should be able to see the middle block surrounded by walls! This is the basic concept of ray casting graphics, now we can turn it into something that resembles a a game. For that we create a game loop which encompasses the vision loop and will also run indefinetly until the game is over. We can make some adjustments to the plotting logic: 
 
 * thicker lines `plt.vlines(i, -h, h, lw = 8)`
 * hide axis `plt.axis('off')`
