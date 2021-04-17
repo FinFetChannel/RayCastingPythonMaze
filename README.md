@@ -165,7 +165,7 @@ Firstly, we can ad some color to the game. After the map was created, we can go 
 
 We can also add a color for the sky/ceiling and for the floor, this can be as simple as thick horizonal lines drawn before the vertical lines. The last cosmetic i want to discuss are floor tiles: in the same way we calculate heights wen we hit a wall we can do everytime the integer part of one of the coordinates changes, later these points are plotted with the scatterplot function (if they dont appear we can make the floor transparent or set the zorder parameter to 2 or some higher value). These also have the function to sinalize the exit to player with a different color for those tiles.
 
-</details>
+<details>
   <summary>Code with cosmetic adjustments:</summary>
   
 ```python
@@ -258,7 +258,7 @@ The maze generator I came up with is veri simple:
 4. This random walker has to have a preference for existing paths, only removing blocks when stuck.
 5. When it reaches the othe side the position is marked as the exit
 
-</details>
+<details>
   <summary>Maze generator:</summary>
   
 ```python
