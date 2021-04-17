@@ -295,7 +295,7 @@ while True:
 
 </details>
 
-Thats all for the first tutorial, if you are interested on what was devekiped after this code:
+Thats all for the first tutorial, if you are interested on what was developed after this first game:
 
 Proto ray tracing: https://youtu.be/ravnXknUvvQ
 
