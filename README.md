@@ -85,7 +85,7 @@ For the user input we will use the keyboard library. Basically using the arrow k
 Now we should have a more les functional game!
 
 <details>
-  <summary>Spoiler warning</summary>
+  <summary>Complete code so far:</summary>
   
   ```python
 import numpy as np
