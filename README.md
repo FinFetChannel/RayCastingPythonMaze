@@ -3,9 +3,10 @@
  ![](gif.gif)
  
 A very simple 3D maze game made from scratch in python, using only three libraries:
-- [Numpy] https://numpy.org/
-- Matplotlib
-- Keyboard
+
+* [Numpy](https://numpy.org/)
+* Matplotlib
+* Keyboard
 
 Based on the Ray Casting technique, where the objects are drawn entirely out of vertical lines. The size and position of the lines is defined by the distance between the player and the object.
 
