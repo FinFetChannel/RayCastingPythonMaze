@@ -11,9 +11,9 @@ Based on the Ray Casting technique, where the objects are drawn entirely out of 
 
 Video tutorial here: https://youtu.be/5xyeWBxmqzc
 
-## Basic setup
+## Basics
 
-We will begin with a very simple map, later we will make a random map generator. The map is defined by a simple matrix, where ones represent walls and zeros represent corridors or empty spaces.
+We will begin with a very simple map, later we will make a random map generator. The map is defined by a simple matrix, where ones represent walls and zeros represent corridors or empty spaces. We also need to set a starting position and direction for the player, and the exit coordinates:
 
 ```python
 import numpy as np
@@ -25,14 +25,11 @@ mapa = [[1, 1, 1, 1, 1],
         [1, 0, 1, 0, 1],
         [1, 0, 0, 0, 1],
         [1, 1, 1, 1, 1]]
-```
-We also need to set a starting position and direction for the player, and the exit coordinates:
 
-```python
 posx, posy, rot = 1.5, 1.5, np.pi/4
 exitx, exity = 3, 3
 ```
-Now we can star the vision loop, with a horizontal field of view of 60°, advancing one degree per iteration. The first ray will start 30° to the right of the player and the last one will be at 30° to the left. The ray always starts at the player's position, with increments based on sine and cosine of the ray angle on a infinite loop. A counter is used to keep the distance value the ray has traveled, otherwise one could simply use Pythagoras theorem to calculate the distance at the end.
+Now we can start the vision loop, with a horizontal field of view of 60°, advancing one degree per iteration. The first ray will start 30° to the right of the player and the last one will be at 30° to the left. A ray always starts at the player's position, with increments based on sine and cosine of the ray angle on a infinite loop. A counter is used to keep the distance value the ray has traveled, otherwise one could simply use Pythagoras theorem to calculate the distance at the end.
 
 To test if a ray has hit a wall we just have to check the integer parts of the ray coordinates against the map. If there was a hit we calculate a height and break out of the while loop. after that we draw a vertical line on position i going from -h to h.
 
@@ -49,8 +46,20 @@ for i in range(60):
             h = 1/(0.02*n)
             break
         
-    plt.vlines(i, -h, h)    
+    plt.vlines(i, -h, h)
+
+plt.show()
 ```
+After that you should be able to see the middle block surrounded by walls! This is the basic concept of ray casting graphics, now we can turn it into something that resembles a a game. For that we create a game loop tha encompasses the vision loop and will açso run indefinetly until the game is over. We can make some adjustments to the plotting logic: 
+
+* thicker lines `plt.vlines(i, -h, h, lw = 8)`
+* hide axis `plt.axis('off')`
+* remove black spaces `plt.tight_layout()`
+* limit plot region  `plt.axis([0, 60, -1, 1])`
+* replace `plt.show() `  with `plt.draw()`
+* pause and clearing for next frame `plt.pause(0.0001); plt.clf()`
+* close the window when the game is over `plt.close()`
+
 
 Proto ray tracing: https://youtu.be/ravnXknUvvQ
 
