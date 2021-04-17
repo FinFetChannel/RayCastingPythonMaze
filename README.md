@@ -13,7 +13,7 @@ Video tutorial here: https://youtu.be/5xyeWBxmqzc
 
 ## Basics
 
-We will begin with a very simple map, later we will make a random map generator. The map is defined by a simple matrix, where ones represent walls and zeros represent corridors or empty spaces. We also need to set a starting position and direction for the player, and the exit coordinates:
+We will begin with a very simple map, later we will make a random map generator. The map is defined by a matrix, where ones represent walls and zeros represent corridors or empty spaces. We also need to set a starting position and direction for the player, as well as the exit coordinates:
 
 ```python
 import numpy as np
