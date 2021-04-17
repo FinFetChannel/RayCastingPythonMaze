@@ -1,4 +1,4 @@
-# RayCastingPythonMaze
+# Ray Casting Python 3D Maze
 
  ![](gif.gif)
  
@@ -295,7 +295,7 @@ while True:
 
 </details>
 
-Thats all for the first tutorial, if you are interested on what was developed after this first game:
+Thats all for the first tutorial, far from a proper game engine, but a fun project nevertheless.
 
 Proto ray tracing: https://youtu.be/ravnXknUvvQ
 
