@@ -82,7 +82,7 @@ For the user input we will use the keyboard library. Basically using the arrow k
             break
         posx, posy = (x, y)
 ```
-Now we should have a more les functional game!
+Now we should have a more or less functional game!
 
 <details>
   <summary>Complete code so far:</summary>
@@ -143,6 +143,7 @@ plt.show()
   
 </details>
 
+Not a fun game, but it is a game. Lets make some improvements.
 Proto ray tracing: https://youtu.be/ravnXknUvvQ
 
 Ray casting 2.0 video: https://youtu.be/WhmTa1NGLSE
