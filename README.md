@@ -143,7 +143,9 @@ plt.show()
   
 </details>
 
-Not a fun game, but it is a game. Lets make some improvements.
+Not a fun game, but it is a game. Lets make some improvements. [tbd]
+
+
 Proto ray tracing: https://youtu.be/ravnXknUvvQ
 
 Ray casting 2.0 video: https://youtu.be/WhmTa1NGLSE
