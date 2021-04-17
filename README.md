@@ -64,7 +64,7 @@ After that you should be able to see the middle block surrounded by walls! This 
 
 * thicker lines `plt.vlines(i, -h, h, lw = 8)`
 * hide axis `plt.axis('off')`
-* remove black spaces `plt.tight_layout()`
+* remove blank spaces `plt.tight_layout()`
 * limit plot region  `plt.axis([0, 60, -1, 1])`
 * replace `plt.show()`  with `plt.draw()`
 * pause and clearing for next frame `plt.pause(0.0001); plt.clf()`
