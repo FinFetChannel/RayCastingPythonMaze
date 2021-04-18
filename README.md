@@ -401,7 +401,7 @@ def reflection(x, y, i, ex, ey, maph, mapc, sin, cos, n, c, h, half, tx, ty, tc)
 </details>
 
 
-That's all, things start o get heavy for matplotlib, so i also ported everything to pygame (togheter with the ray tracing game, see files). Anyway, here is the code for matplotlib:
+That's all, things start o get heavy for matplotlib, so i also ported everything to pygame (together with the ray tracing game, see files). Anyway, here is the code for matplotlib:
 
 <details>
   <summary>Reflections:</summary>
