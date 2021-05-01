@@ -161,7 +161,7 @@ plt.close()
 Not a fun game, but it is a game. Lets make some improvements.
 
 ## Refinements
-Firstly, we can ad some color to the game. After the map was created, we can go through all its positions and replace the ones with random RGB colors or, altenatively, create a secondary matrix to store the colors. These colors are later retrived everytime we hit a wall and used to set the "colors" parameter in the vlines function. We will also add a shading factor based on the distance the ray has traveled, so closer walls are brighter.
+Firstly, we can add some color to the game. After the map was created, we can go through all its positions and replace the "ones" with random RGB colors or, altenatively, create a secondary matrix to store the colors. These colors are later retrived everytime we hit a wall and used to set the "colors" parameter in the vlines function. We will also add a shading factor based on the distance the ray has traveled, so closer walls are brighter.
 
 We can also add a color for the sky/ceiling and for the floor, this can be as simple as thick horizonal lines drawn before the vertical lines. The last cosmetic i want to discuss are floor tiles: in the same way we calculate heights wen we hit a wall we can do everytime the integer part of one of the coordinates changes, later these points are plotted with the scatterplot function (if they dont appear we can make the floor transparent or set the zorder parameter to 2 or some higher value). These also have the function to sinalize the exit to player with a different color for those tiles.
 
